@@ -20,51 +20,97 @@ enum Operation {
     }
 }
 
-struct Digit {
+enum FlowItem {
+    case digit(Digit)
+    case operation(Operation)
+    
+    var displayValue: String {
+        switch self {
+        case let .digit(value):
+            return value.displayValue
+        case let .operation(value):
+            return value.symbol
+        }
+    }
+}
+
+class Digit {
     private var isNegative = false
-    private var value = "0"
+    private var values: String = "0"
+    
+    var displayValue: String {
+        isNegative ? "(-\(values))" : values
+    }
+    
+    init() {}
+    
+    func input(v: String) {
+        if v == "," {
+            handleDecimalPoint()
+        } else if values == "0" {
+            values = v
+        } else {
+            values += v
+        }
+    }
+    
+    func changeSign(to sign: Sign) {
+        guard values != "0" else { return }
+        isNegative = sign == .negative
+    }
+    
+    func handleDecimalPoint() {
+        if !values.contains(",") {
+            values += ","
+        }
+    }
 }
 
 class Flow {
-    private var digits = "0"
+    private var digits: [FlowItem] = []
     private var isNegative = false
     
     var displayValue: String {
-        isNegative ? "(-\(digits))" : digits
+        if digits.isEmpty { return "0" }
+        return digits.map { $0.displayValue }.joined()
     }
     
     init() {}
     
     func changeSign(to sign: Sign) {
-        guard digits != "0" else { return }
-        isNegative = sign == .negative
-    }
-    
-    func input(_ operation: Operation) {
-        digits += operation.symbol
-    }
-   
-    func input(_ digit: String) {
-        if digit == "," {
-            handleDecimalPoint()
-        } else if digits == "0" {
-            digits = digit
+        guard case let .digit(value) = digits.last else { return }
+        if digits.count >= 2,
+           case let .operation(op) = digits[digits.count - 2],
+           op == .subtraction
+        {
+            digits[digits.count - 2] = .operation(.addition)
         } else {
-            digits += digit
+            value.changeSign(to: sign)
         }
     }
     
+    func input(_ operation: Operation) {
+        digits.append(.operation(operation))
+    }
+   
+    func input(_ digit: String) {
+        if case let .digit(val) = digits.last {
+            val.input(v: digit)
+            return
+        }
+        let d = Digit()
+        d.input(v: digit)
+        digits.append(
+            .digit(d)
+        )
+    }
+    
     func clear() {
-        digits = "0"
-        isNegative = false
+        digits = []
     }
 }
 
 private extension Flow {
     
-    func handleDecimalPoint() {
-        if !digits.contains(",") {
-            digits += ","
-        }
-    }
+    
 }

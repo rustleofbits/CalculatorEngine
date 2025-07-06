@@ -1,184 +1,207 @@
 import Testing
-import XCTest
 @testable import CalculatorEngine
 
-class FlowTest: XCTestCase {
-    func test_initialDisplayValue_isZero() {
-        let sut = Flow()
-        XCTAssertEqual(sut.displayValue, "0")
+@Suite("Flow basic operations")
+struct FlowTest {
+    let sut = Flow()
+    @Test func initialDisplayValue_isZero() async throws {
+        #expect(sut.displayValue == "0")
     }
     
-    func test_singleDigitInput_updatesDisplayValue() {
-        let sut = Flow()
+    @Test func singleDigitInput_updatesDisplayValue() async throws {
         sut.input("1")
-        XCTAssertEqual(sut.displayValue, "1")
+        #expect(sut.displayValue == "1")
     }
     
-    func test_multipleDigitInput_appendsToDisplayValue() {
-        let sut = Flow()
+    @Test func multipleDigitInput_appendsToDisplayValue() async throws {
         sut.input("1")
         sut.input("2")
         sut.input("0")
-        XCTAssertEqual(sut.displayValue, "120")
+        #expect(sut.displayValue == "120")
     }
     
-    func test_clear_resetsDisplayValueToZero() {
-        let sut = Flow()
-        sut.input("4")
-        sut.input("3")
+    @Test func clear_resetsDisplayValueToZero() async throws {
+        sut.input("1")
+        sut.input("2")
         sut.clear()
-        XCTAssertEqual(sut.displayValue, "0")
+        #expect(sut.displayValue == "0")
     }
     
-    func test_negativeSignInput_addsNegativeSignToZero() {
-        let sut = Flow()
+    @Test func negativeSignInput_addsNegativeSignToZero() async throws {
         sut.changeSign(to: .negative)
-        XCTAssertEqual(sut.displayValue, "0")
+        #expect(sut.displayValue == "0")
     }
     
-    func test_negativeSignWithDigit_setsNegativeValue() {
-        let sut = Flow()
+    @Test func negativeSignWithDigit_setsNegativeValue() {
         sut.input("4")
         sut.changeSign(to: .negative)
-        XCTAssertEqual(sut.displayValue, "(-4)")
+        #expect(sut.displayValue == "(-4)")
     }
     
-    func test_negativeSignWithZero_setsNegativeZero() {
-        let sut = Flow()
+    @Test func negativeSignWithZero_setsZero() {
         sut.changeSign(to: .negative)
         sut.input("0")
-        XCTAssertEqual(sut.displayValue, "0")
+        #expect(sut.displayValue == "0")
     }
     
-    func test_positiveSignWithDigit_setsPositiveValue() {
-        let sut = Flow()
-        sut.changeSign(to: .positive)
+    @Test func positiveSignWithDigit_setsPositiveValue() async throws {
         sut.input("5")
-        XCTAssertEqual(sut.displayValue, "5")
+        sut.changeSign(to: .positive)
+        #expect(sut.displayValue == "5")
     }
     
-    func test_setPositiveSign_toNegativeValue_removesNegativeSign() {
-        let sut = Flow()
+    @Test func switchFromNegativeToPositiveSign() async throws {
         sut.input("5")
         sut.changeSign(to: .negative)
         sut.changeSign(to: .positive)
-        XCTAssertEqual(sut.displayValue, "5")
+        #expect(sut.displayValue == "5")
     }
     
-    func test_inputCommaAfterZero() {
-        let sut = Flow()
+    @Test func inputCommaAfterZero() async throws {
         sut.input(",")
-        XCTAssertEqual(sut.displayValue, "0,")
+        #expect(sut.displayValue == "0,")
     }
     
-    func test_inputDigitAfterZeroWithComma_createsFractionalDisplayValue() {
-        let sut = Flow()
+    @Test func inputDigitAfterZeroWithComma_createsFractionalDisplayValue() async throws {
         sut.input("0")
         sut.input(",")
         sut.input("2")
-        XCTAssertEqual(sut.displayValue, "0,2")
+        #expect(sut.displayValue == "0,2")
     }
     
-    func test_inputDigitAfterCommaDigit_createsFractionalDisplayValue() {
-        let sut = Flow()
+    @Test func inputDigitAfterCommaDigit_createsFractionalDisplayValue() async throws {
         sut.input("1")
         sut.input(",")
         sut.input("2")
-        XCTAssertEqual(sut.displayValue, "1,2")
+        #expect(sut.displayValue == "1,2")
     }
     
-    func test_switchFromPositiveToNegative_addsNegativeSign() {
-        let sut = Flow()
+    @Test func switchFromPositiveToNegative_addsNegativeSign() async throws {
         sut.input("5")
         sut.changeSign(to: .negative)
-        XCTAssertEqual(sut.displayValue, "(-5)")
+        #expect(sut.displayValue == "(-5)")
     }
     
-    func test_addMultipleCommas_doesNotChangeValue() {
-        let sut = Flow()
+    @Test func addMultipleCommas_doesNotChangeValue() async throws {
         sut.input("1")
         sut.input(",")
         sut.input("2")
         sut.input(",")
-        XCTAssertEqual(sut.displayValue, "1,2")
+        #expect(sut.displayValue == "1,2")
     }
     
-    func test_negativeZeroWithComma() {
-        let sut = Flow()
+    @Test func negativeZeroWithComma() async throws {
         sut.input(",")
         sut.changeSign(to: .negative)
-        XCTAssertEqual(sut.displayValue, "(-0,)")
+        #expect(sut.displayValue == "(-0,)")
     }
     
-    func test_negativeDigitWithComma() {
-        let sut = Flow()
+    @Test func negativeDigitWithComma() async throws {
         sut.input("5")
         sut.input(",")
         sut.input(",")
         sut.input("8")
         sut.changeSign(to: .negative)
-        XCTAssertEqual(sut.displayValue, "(-5,8)")
+        #expect(sut.displayValue == "(-5,8)")
     }
     
-    func test_negativeDigitWithCommaToPositive() {
-        let sut = Flow()
+    @Test func negativeDigitWithCommaToPositive() async throws {
         sut.input("5")
         sut.input(",")
         sut.input(",")
         sut.input("8")
         sut.changeSign(to: .negative)
         sut.changeSign(to: .positive)
-        XCTAssertEqual(sut.displayValue, "5,8")
+        #expect(sut.displayValue == "5,8")
     }
     
-    func test_zeroAfterComma_keepsValueZero() {
-        let sut = Flow()
+    @Test func zeroAfterComma_keepsValueZero() async throws {
         sut.input("0")
         sut.input(",")
         sut.input("0")
-        XCTAssertEqual(sut.displayValue, "0,0")
+        #expect(sut.displayValue == "0,0")
     }
     
-    func test_inputAddition_addsPlusSign() {
-        let sut = Flow()
+    @Test func inputAddition_addsPlusSign() async throws {
         sut.input("0")
         sut.input(.addition)
         sut.input("5")
-        XCTAssertEqual(sut.displayValue, "0+5")
+        #expect(sut.displayValue == "0+5")
     }
     
-    func test_inputSubtraction_addsMinusSign() {
-        let sut = Flow()
+    @Test func inputSubtraction_addsMinusSign() async throws {
         sut.input("9")
         sut.input(.subtraction)
         sut.input("5")
-        XCTAssertEqual(sut.displayValue, "9-5")
+        #expect(sut.displayValue == "9-5")
     }
     
-    func test_inputMultiplication_addsTimesSign() {
-        let sut = Flow()
+    @Test func inputMultiplication_addsTimesSign() async throws {
         sut.input("9")
         sut.input(.multiplication)
         sut.input("5")
-        XCTAssertEqual(sut.displayValue, "9×5")
+        #expect(sut.displayValue == "9×5")
     }
     
-    func test_inputDivision_addsDividedBySign() {
-        let sut = Flow()
+    @Test func inputDivision_addsDividedBySign() async throws {
         sut.input("9")
         sut.input(.division)
         sut.input("5")
-        XCTAssertEqual(sut.displayValue, "9÷5")
+        #expect(sut.displayValue == "9÷5")
     }
     
-//    func test_inputAddition_ofNegativeNumbers_keepsSign() {
-//        let sut = Flow()
-//        sut.input("5")
-//        sut.changeSign(to: .negative)
-//        sut.input(.addition)
-//        sut.input("6")
-//        sut.changeSign(to: .negative)
-//        print("!!! ", sut.displayValue)
-//        XCTAssertEqual(sut.displayValue, "(-5)+(-6)")
-//    }
+    @Test func inputAddition_ofNegativeNumbers_keepsSign() {
+        sut.input("5")
+        sut.changeSign(to: .negative)
+        sut.input(.addition)
+        sut.input("6")
+        sut.changeSign(to: .negative)
+        #expect(sut.displayValue == "(-5)+(-6)")
+    }
+    
+    @Test func subtractionOfNegativeNumber_transformsToAdditionToPositiveNumber() async throws {
+        sut.input("5")
+        sut.input(.subtraction)
+        sut.input("7")
+        sut.changeSign(to: .negative)
+        #expect(sut.displayValue == "5+7")
+    }
+    
+    @Test func multiplyNegativeNumbers() async throws {
+        sut.input("5")
+        sut.changeSign(to: .negative)
+        sut.input(.multiplication)
+        sut.input("7")
+        sut.changeSign(to: .negative)
+        #expect(sut.displayValue == "(-5)×(-7)")
+    }
+    
+    @Test func negativeDecimalNumber() async throws {
+        sut.input("5")
+        sut.input(",")
+        sut.input("7")
+        sut.changeSign(to: .negative)
+        #expect(sut.displayValue == "(-5,7)")
+    }
+    
+    @Test func negativeDecimalNumberWithZero() async throws {
+        sut.input("0")
+        sut.input(",")
+        sut.input("7")
+        sut.changeSign(to: .negative)
+        #expect(sut.displayValue == "(-0,7)")
+    }
+    
+    @Test func subtractionOfTwoNegativeDecimalNumber_transformsToAdditionToPositive() async throws {
+        sut.input("0")
+        sut.input(",")
+        sut.input("7")
+        sut.changeSign(to: .negative)
+        sut.input(.subtraction)
+        sut.input("0")
+        sut.input(",")
+        sut.input("7")
+        sut.changeSign(to: .negative)
+        #expect(sut.displayValue == "(-0,7)+0,7")
+    }
 }
